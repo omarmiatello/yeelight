@@ -27,19 +27,19 @@ Grab via Gradle (v4 or later):
 Gradle Groovy syntax
 ```groovy
 // core library
-implementation 'com.github.omarmiatello.yeelight:core:1.0.0'
+implementation 'com.github.omarmiatello.yeelight:core:1.0.1'
 
 // extensions example (my home)
-implementation 'com.github.omarmiatello.yeelight:home-ktx:1.0.0'
+implementation 'com.github.omarmiatello.yeelight:home-ktx:1.0.1'
 ```
 
 Gradle Kotlin syntax
 ```kotlin
 // core library
-implementation("com.github.omarmiatello.yeelight:core:1.0.0")
+implementation("com.github.omarmiatello.yeelight:core:1.0.1")
 
 // extensions example (my home)
-implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.0")
+implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.1")
 ```
 
 ### Example

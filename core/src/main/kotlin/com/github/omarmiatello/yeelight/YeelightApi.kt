@@ -64,7 +64,7 @@ object YeelightApi {
 
     fun stopColorFlow() = YeelightCmd("stop_cf")
 
-    fun setScene(scene: YeelightScene) = YeelightCmd("set_scene", listOf(scene.name, scene.params))
+    fun setScene(scene: YeelightScene) = YeelightCmd("set_scene", listOf(scene.name) + scene.params)
 
     fun cronAdd(
         cron: YeelightCron
@@ -74,7 +74,7 @@ object YeelightApi {
     fun cronDel() = YeelightCmd("cron_del")
 
     /**
-     * colorTemperature: 1700 ~ 6500
+     * whiteTemperature: 1700 ~ 6500
      */
     fun setWhiteTemperature(
         whiteTemperature: Int,
@@ -85,6 +85,9 @@ object YeelightApi {
         listOf(whiteTemperature.coerceIn(1700..6500), effect.id, duration.toLongMilliseconds())
     )
 
+    /**
+     * color: 0x000000 - 0xFFFFFF
+     */
     fun setColorRgb(
         color: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
@@ -114,7 +117,12 @@ data class YeelightCmd(val method: String, val params: List<@Contextual Any> = e
     val id = 1
 
     @Transient
-    val realCommand = json.encodeToString(this)
+    val realCommand = try {
+        json.encodeToString(this)
+    } catch (e: Exception) {
+        println("encode fail: $id --> $this")
+        throw e
+    }
 }
 
 enum class SpeedEffect {
@@ -129,29 +137,37 @@ private enum class FlowMode(val id: Int) { colorRgb(1), colorTemperature(2), sle
 
 // Scene
 
-sealed class YeelightScene(val name: String, vararg val params: Any)
+sealed class YeelightScene(val name: String, val params: List<Any>)
+
+/**
+ * hue: 0 - 359
+ * sat: 0 - 100
+ * */
 class SceneColorHsv(
     hue: Int,
-    sat: Int,
-    brightness: Int
-) : YeelightScene("hsv", hue, sat, brightness)
+    sat: Int = 100,
+    brightness: Int = 100
+) : YeelightScene("hsv", listOf(hue, sat, brightness))
 
+/**
+ * color: 0x000000 - 0xFFFFFF
+ */
 class SceneColorRgb(
     color: Int,
-    brightness: Int
-) : YeelightScene("ct", color, brightness)
+    brightness: Int = 100
+) : YeelightScene("ct", listOf(color, brightness))
 
 class SceneColorFlow(
     flowTuples: List<FlowTuple>,
     repeat: Int = 1,
     action: FlowEndAction = FlowEndAction.recover
-) : YeelightScene("cf", *colorFlowBuilder(flowTuples, repeat, action).toTypedArray())
+) : YeelightScene("cf", colorFlowBuilder(flowTuples, repeat, action))
 
 @OptIn(ExperimentalTime::class)
 class SceneAutoDelayOff(
-    brightness: Int,
+    brightness: Int = 100,
     duration: Duration = 1.minutes
-) : YeelightScene("auto_delay_off", brightness, duration.coerceAtLeast(1.minutes).inMinutes.toInt())
+) : YeelightScene("auto_delay_off", listOf(brightness, duration.coerceAtLeast(1.minutes).inMinutes.toInt()))
 
 // Cron
 @OptIn(ExperimentalTime::class)
