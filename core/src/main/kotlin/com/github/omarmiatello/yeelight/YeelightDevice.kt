@@ -1,8 +1,6 @@
 package com.github.omarmiatello.yeelight
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.net.Socket
 import java.net.SocketTimeoutException
@@ -10,7 +8,7 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
-@ExperimentalTime
+@OptIn(ExperimentalTime::class)
 data class YeelightDevice(
     val id: String,
     val ip: String,
@@ -28,9 +26,6 @@ data class YeelightDevice(
     val name: String,
     private val enableLog: Boolean = true,
 ) {
-    suspend fun asyncFor(cmd: YeelightCmd) = coroutineScope {
-        async { send(cmd) }
-    }
 
     suspend fun send(cmd: YeelightCmd): String? = withContext(Dispatchers.IO) {
         Socket(ip, port).use { socket ->
@@ -63,10 +58,9 @@ data class YeelightDevice(
         isOn: Boolean = true,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = send(YeelightApi.setPower(isOn, effect, duration.toLongMilliseconds().toInt()))
+    ) = send(YeelightApi.setPower(isOn, effect, duration))
 
-    suspend fun toggle() =
-        send(YeelightApi.toggle())
+    suspend fun toggle() = send(YeelightApi.toggle())
 
     /**
      * brightness: 1 - 100
@@ -75,37 +69,35 @@ data class YeelightDevice(
         brightness: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = send(YeelightApi.setBrightness(brightness, effect, duration.toLongMilliseconds().toInt()))
+    ) = send(YeelightApi.setBrightness(brightness, effect, duration))
 
     suspend fun startColorFlow(
         flowTuples: List<FlowTuple>,
         repeat: Int = 1,
         action: FlowEndAction = FlowEndAction.recover
-    ) = send(YeelightApi.startColorFlow(repeat * flowTuples.size, action, flowTuples.joinToString(",")))
+    ) = send(YeelightApi.startColorFlow(flowTuples, repeat, action))
 
-    suspend fun stopColorFlow() =
-        send(YeelightApi.stopColorFlow())
+    suspend fun stopColorFlow() = send(YeelightApi.stopColorFlow())
 
-    suspend fun _setScene() =
-        send(YeelightApi._setScene())
+    suspend fun setScene(scene: YeelightScene) =
+        send(YeelightApi.setScene(scene))
 
-    suspend fun _cronAdd() =
-        send(YeelightApi._cronAdd())
+    suspend fun cronAdd(
+        cron: YeelightCron
+    ) = send(YeelightApi.cronAdd(cron))
 
-    suspend fun _cronGet() =
-        send(YeelightApi._cronGet())
+    suspend fun cronGet() = send(YeelightApi.cronGet())
 
-    suspend fun _cronDel() =
-        send(YeelightApi._cronDel())
+    suspend fun cronDel() = send(YeelightApi.cronDel())
 
     /**
      * colorTemperature: 1700 ~ 6500
      */
-    suspend fun setColorTemperature(
+    suspend fun setWhiteTemperature(
         whiteTemperature: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = send(YeelightApi.setWhiteTemperature(whiteTemperature, effect, duration.toLongMilliseconds().toInt()))
+    ) = send(YeelightApi.setWhiteTemperature(whiteTemperature, effect, duration))
 
     /**
      * color: 0x000000 - 0xFFFFFF
@@ -114,10 +106,10 @@ data class YeelightDevice(
         color: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = send(YeelightApi.setColorRgb(color, effect, duration.toLongMilliseconds().toInt()))
+    ) = send(YeelightApi.setColorRgb(color, effect, duration))
 }
 
-@ExperimentalTime
+@OptIn(ExperimentalTime::class)
 fun String.toYeelightBulb(): YeelightDevice {
     val info = lines().map { it.split(":", limit = 2) }.filter { it.size == 2 }
         .map { it[0] to it[1].trim() }.toMap()

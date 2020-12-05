@@ -4,14 +4,15 @@
 
 This library has 3 modules:
 - Module `:core:`
-  - `YeelightManager`
+  - high level api: `YeelightManager`, `YeelightDevice`, `YeelightColorFlowPresets`
+  - low level api: `YeelightApi`
 - Module `:home-ktx:`
-  - extensions example
+  - extensions (for my home)
 - Module `:app:`
-  - app example!
+  - example app!
 
 
-## Setup `:core:` module
+## Setup
 
 Add this in your root `build.gradle` file:
 ```gradle
@@ -22,12 +23,23 @@ repositories {
 ```
 
 Grab via Gradle (v4 or later):
+
+Gradle Groovy syntax
 ```groovy
 // core library
-implementation 'com.github.omarmiatello.yeelight:core:0.0.1'
+implementation 'com.github.omarmiatello.yeelight:core:1.0.0'
 
 // extensions example (my home)
-implementation 'com.github.omarmiatello.yeelight:home-ktx:0.0.1'
+implementation 'com.github.omarmiatello.yeelight:home-ktx:1.0.0'
+```
+
+Gradle Kotlin syntax
+```kotlin
+// core library
+implementation("com.github.omarmiatello.yeelight:core:1.0.0")
+
+// extensions example (my home)
+implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.0")
 ```
 
 ### Example
@@ -61,30 +73,31 @@ suspend fun main() {
     // set brightness: 1 to 100
     myDevice.setBrightness(50)
 
-    // start flow
+    // start color flow
     myDevice.startColorFlow(
       flowTuples = listOf(FlowColor(0xFF0000), FlowColor(0x00FF00)),
       repeat = 1,
       action = FlowEndAction.off
     )
 
-    // stop flow
+    // stop color flow
     myDevice.stopColorFlow()
 
-    // WIP
-    myDevice._setScene()
+    // set the smart LED directly to specified state.
+    // If the smart LED is off, then it will turn on the smart LED firstly and then apply the specified command 
+    myDevice.setScene(SceneAutoDelayOff(brightness = 50, duration = 3.minutes))
 
-    // WIP
-    myDevice._cronAdd()
+    // start a timer job
+    myDevice.cronAdd(CronPowerOff(5.minutes))
 
-    // WIP
-    myDevice._cronGet()
+    // retrieve the setting of the current cron job
+    myDevice.cronGet()
 
-    // WIP
-    myDevice._cronDel()
+    //  stop the specified cron job (currently support only CronPowerOff)
+    myDevice.cronDel()
 
     // set white temperature (1700 - 5600)
-    myDevice.setColorTemperature(5000)
+    myDevice.setWhiteTemperature(5000)
 
     // set color from black `0x000000` to white `0xFFFFFF`
     myDevice.setColorRgb(0xFF0000)

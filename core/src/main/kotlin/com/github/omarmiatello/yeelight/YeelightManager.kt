@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package com.github.omarmiatello.yeelight
 
 import kotlinx.coroutines.*
@@ -9,7 +7,7 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
-
+@OptIn(ExperimentalTime::class)
 class YeelightManager(
     private val enableLog: Boolean = true,
 ) {
@@ -60,10 +58,9 @@ class YeelightManager(
 
     suspend fun sendToAllDevices(cmd: YeelightCmd): List<String?> = coroutineScope {
         findAllDevices()
-        devices.map { it.asyncFor(cmd) }.awaitAll()
+        devices.map { async { it.send(cmd) } }.awaitAll()
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun printAllYeelightDevices() {
         val allDevices = findAllDevices(2.seconds)
         allDevices.forEachIndexed { index, device ->

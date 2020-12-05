@@ -10,6 +10,7 @@ import kotlinx.coroutines.cancel
 import kotlin.coroutines.coroutineContext
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
+import kotlin.time.minutes
 
 suspend fun main() {
     val yeelight = YeelightManager()
@@ -50,19 +51,19 @@ suspend fun main() {
         myDevice.stopColorFlow()
 
         // WIP
-        myDevice._setScene()
+        myDevice.setScene(SceneAutoDelayOff(brightness = 50, duration = 3.minutes))
 
-        // WIP
-        myDevice._cronAdd()
+        // start a timer job
+        myDevice.cronAdd(CronPowerOff(5.minutes))
 
-        // WIP
-        myDevice._cronGet()
+        // retrieve the setting of the current cron job
+        myDevice.cronGet()
 
-        // WIP
-        myDevice._cronDel()
+        //  stop the specified cron job (currently support only CronPowerOff)
+        myDevice.cronDel()
 
         // set white temperature (1700 - 5600)
-        myDevice.setColorTemperature(5000)
+        myDevice.setWhiteTemperature(5000)
 
         // set color from black `0x000000` to white `0xFFFFFF`
         myDevice.setColorRgb(0xFF0000)
