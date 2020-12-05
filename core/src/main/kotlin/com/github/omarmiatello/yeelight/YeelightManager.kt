@@ -60,7 +60,7 @@ class YeelightManager(
 
     suspend fun sendToAllDevices(cmd: YeelightCmd): List<String?> = coroutineScope {
         findAllDevices()
-        devices.map { it.asyncCmd(cmd) }.awaitAll()
+        devices.map { it.asyncFor(cmd) }.awaitAll()
     }
 
     @OptIn(ExperimentalTime::class)

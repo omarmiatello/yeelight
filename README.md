@@ -4,7 +4,6 @@
 
 This library has 3 modules:
 - Module `:core:`
-  - `data class` with [Kotlinx/Serialization](https://github.com/Kotlin/kotlinx.serialization)
   - `YeelightManager`
 - Module `:home-ktx:`
   - extensions example
@@ -12,11 +11,7 @@ This library has 3 modules:
   - app example!
 
 
-## How to use `dataclass` module
-
-This module could be used for parse the NoExp requests, and for send back a response.
-
-#### Setup `dataclass` module
+## Setup `:core:` module
 
 Add this in your root `build.gradle` file:
 ```gradle
@@ -41,24 +36,82 @@ implementation 'com.github.omarmiatello.yeelight:home-ktx:0.0.1'
 suspend fun main() {
   val yeelight = YeelightManager()
 
-  yeelight.roomCucina().forEach { it.sendCmd(YeelightApi.setPower(true)) }
-  yeelight.cucina1().sendCmd(YeelightApi.flowPolice())
-  yeelight.cucina2().sendCmd(christmasUsaFlow)
+  // for debug: Network search + print details
+  yeelight.printAllYeelightDevices()
+
+  val myDevice = yeelight.findDeviceById("0x0000000011744b6b")
+
+  if (myDevice != null) {
+
+    // switch on (smooth, 500ms)
+    myDevice.setPower(true)
+
+    // switch off (instant)
+    myDevice.setPower(isOn = false, effect = SpeedEffect.sudden)
+
+    // get properties values (ex: power state)
+    myDevice.getProperties("power")
+
+    // set current configuration as default
+    myDevice.setCurrentAsDefault()
+
+    // switch toggle `on -> off` or `off -> on`
+    myDevice.toggle()
+
+    // set brightness: 1 to 100
+    myDevice.setBrightness(50)
+
+    // start flow
+    myDevice.startColorFlow(
+      flowTuples = listOf(FlowColor(0xFF0000), FlowColor(0x00FF00)),
+      repeat = 1,
+      action = FlowEndAction.off
+    )
+
+    // stop flow
+    myDevice.stopColorFlow()
+
+    // WIP
+    myDevice._setScene()
+
+    // WIP
+    myDevice._cronAdd()
+
+    // WIP
+    myDevice._cronGet()
+
+    // WIP
+    myDevice._cronDel()
+
+    // set white temperature (1700 - 5600)
+    myDevice.setColorTemperature(5000)
+
+    // set color from black `0x000000` to white `0xFFFFFF`
+    myDevice.setColorRgb(0xFF0000)
+  }
+
+  // control a group of lights
+  yeelight.roomCucina().forEach {
+    it.setPower(true)
+    it.startColorFlow(flowPolice(speed = 1.5), repeat = 3, action = FlowEndAction.off)
+  }
+
+  // preset flows
+  yeelight.cucina1().startColorFlow(flowPolice())
+
+  // custom flows
+  yeelight.cucina2().startColorFlow(christmasUsaFlow)
 
   coroutineContext.cancel()
 }
 
-val christmasUsaFlow = YeelightApi.easyFlow(
-  flowTuples = listOf(
-    FlowColor(0xFF0000, 100, 0.milliseconds),
-    FlowSleep(300.milliseconds),
-    FlowColor(0x0000FF, 100, 0.milliseconds),
-    FlowSleep(300.milliseconds),
-    FlowColor(0xFFFFFF, 100, 0.milliseconds),
-    FlowSleep(300.milliseconds),
-  ),
-  repeat = 3,
-  action = FlowEndAction.off,
+val christmasUsaFlow = listOf(
+  FlowColor(0xFF0000, 100, 0.milliseconds),
+  FlowSleep(300.milliseconds),
+  FlowColor(0x0000FF, 100, 0.milliseconds),
+  FlowSleep(300.milliseconds),
+  FlowColor(0xFFFFFF, 100, 0.milliseconds),
+  FlowSleep(300.milliseconds),
 )
 ```
 

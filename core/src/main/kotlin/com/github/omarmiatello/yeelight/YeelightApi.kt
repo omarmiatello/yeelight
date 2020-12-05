@@ -35,8 +35,8 @@ object YeelightApi {
     /**
      * colorTemperature: 1700 ~ 6500
      */
-    fun setColorTemperature(colorTemperature: Int, effect: SpeedEffect = SpeedEffect.smooth, duration: Int = 500) =
-        YeelightCmd("set_ct_abx", listOf(colorTemperature.coerceIn(1700..6500), effect.id, duration))
+    fun setWhiteTemperature(whiteTemperature: Int, effect: SpeedEffect = SpeedEffect.smooth, duration: Int = 500) =
+        YeelightCmd("set_ct_abx", listOf(whiteTemperature.coerceIn(1700..6500), effect.id, duration))
 
     fun setColorRgb(color: Int, effect: SpeedEffect = SpeedEffect.smooth, duration: Int = 500) =
         YeelightCmd("set_rgb", listOf(color.coerceIn(0..0xffffff), effect.id, duration))
@@ -46,12 +46,6 @@ enum class SpeedEffect { sudden, smooth; val id = name }
 enum class FlowEndAction(val id: Int) { recover(0), stay(1), off(2) }
 private enum class FlowMode(val id: Int) { colorRgb(1), colorTemperature(2), sleep(7) }
 
-@ExperimentalTime
-fun YeelightApi.easyFlow(
-    flowTuples: List<FlowTuple>,
-    repeat: Int = 1,
-    action: FlowEndAction = FlowEndAction.recover
-) = startColorFlow(repeat * flowTuples.size, action, flowTuples.joinToString(","))
 
 @ExperimentalTime
 sealed class FlowTuple(
