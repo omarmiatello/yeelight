@@ -128,6 +128,14 @@ val christmasUsaFlow = listOf(
 )
 ```
 
+### Note: All functions here are ![suspend](docs/suspend.png) suspending function
+
+[Kotlin suspending function](https://kotlinlang.org/docs/reference/coroutines/basics.html) does not block a thread, but suspends the coroutine, and it can be only used from a coroutine.
+
+![Suspending functions](docs/suspending_functions.png)
+
+
+
 ## License
 
     MIT License

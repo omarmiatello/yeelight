@@ -50,7 +50,8 @@ suspend fun main() {
         // stop flow
         myDevice.stopColorFlow()
 
-        // WIP
+        // set the smart LED directly to specified state.
+        // If the smart LED is off, then it will turn on the smart LED firstly and then apply the specified command
         myDevice.setScene(SceneAutoDelayOff(brightness = 50, duration = 3.minutes))
 
         // start a timer job
