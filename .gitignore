@@ -1,0 +1,10 @@
+.idea
+*.iml
+.gradle
+/build/
+!gradle-wrapper.jar
+/data/
+/app/build/
+/core/build/
+/home-ktx/build/
+/domain/build/
