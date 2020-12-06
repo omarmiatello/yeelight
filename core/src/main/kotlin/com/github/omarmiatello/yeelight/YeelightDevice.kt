@@ -1,9 +1,7 @@
 package com.github.omarmiatello.yeelight
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.net.Socket
-import java.net.SocketTimeoutException
+import io.ktor.network.sockets.*
+import io.ktor.utils.io.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -27,26 +25,19 @@ data class YeelightDevice(
     private val enableLog: Boolean = true,
 ) {
 
-    suspend fun send(cmd: YeelightCmd): String? = withContext(Dispatchers.IO) {
-        Socket(ip, port).use { socket ->
-            // socket.setKeepAlive(true)
-            socket.soTimeout = 1000
-            socket.getOutputStream().bufferedWriter().use { writer ->
-                if (enableLog) println("$id --> ${cmd.realCommand}")
-                writer.write("${cmd.realCommand}\r\n")
-                writer.flush()
-
-                socket.getInputStream().bufferedReader().use { reader ->
-                    try {
-                        reader.readLine().also { if (enableLog) println("$id <-- $it") }
-                    } catch (e: SocketTimeoutException) {
-                        // ignore
-                        null
-                    }
-                }
+    suspend fun send(cmd: YeelightCmd): String? = aSocket(YeelightManager.ioSelector).tcp()
+        .connect(ip, port) { socketTimeout = 2000 }
+        .use { socket ->
+            socket.openWriteChannel(autoFlush = true).writeStringUtf8("${cmd.realCommand}\r\n")
+                .also { if (enableLog) println("$id --> ${cmd.realCommand}") }
+            try {
+                socket.openReadChannel().readUTF8Line()
+                    .also { if (enableLog) println("$id <-- $it") }
+            } catch (e: SocketTimeoutException) {
+                if (enableLog) println("$id <-- !! Response Timeout !! (request: ${cmd.realCommand})")
+                null
             }
         }
-    }
 
     suspend fun getProperties(vararg propertiesNames: String) =
         send(YeelightApi.getProperties(*propertiesNames))
