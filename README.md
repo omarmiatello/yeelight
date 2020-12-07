@@ -1,4 +1,6 @@
-# Common libraries for Yeelight project
+# Yeelight Kotlin library
+
+Control your Xiaomi Yeelight lamp using Kotlin. This library use [Ktor](https://github.com/ktorio/ktor) for sockets, more info [available here](https://ktor.io/docs/servers-raw-sockets.html).
 
 [![](https://jitpack.io/v/omarmiatello/yeelight.svg)](https://jitpack.io/#omarmiatello/yeelight)
 
