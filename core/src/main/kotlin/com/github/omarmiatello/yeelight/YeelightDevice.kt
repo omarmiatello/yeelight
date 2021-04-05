@@ -106,8 +106,7 @@ data class YeelightDevice(
 
 @OptIn(ExperimentalTime::class)
 fun String.toYeelightBulb(): YeelightDevice {
-    val info = lines().map { it.split(":", limit = 2) }.filter { it.size == 2 }
-        .map { it[0] to it[1].trim() }.toMap()
+    val info = lines().map { it.split(":", limit = 2) }.filter { it.size == 2 }.associate { it[0] to it[1].trim() }
     val address = info.getValue("Location").split("//")[1].split(":")
     return YeelightDevice(
         id = info.getValue("id"),
