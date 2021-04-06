@@ -5,9 +5,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-group = "com.github.omarmiatello.yeelight"
-version = "1.0.3"
-
 repositories {
     mavenCentral()
 }

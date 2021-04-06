@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+    // implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.4")
     implementation(project(":home-ktx"))
 }
 

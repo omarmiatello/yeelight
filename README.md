@@ -2,7 +2,7 @@
 
 Control your Xiaomi Yeelight lamp using Kotlin. This library use [Ktor](https://github.com/ktorio/ktor) for sockets, more info [available here](https://ktor.io/docs/servers-raw-sockets.html).
 
-[![](https://jitpack.io/v/omarmiatello/yeelight.svg)](https://jitpack.io/#omarmiatello/yeelight)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.omarmiatello.yeelight/core)](https://search.maven.org/search?q=g:com.github.omarmiatello.yeelight)
 
 This library has 3 modules:
 - Module `:core:`
@@ -16,32 +16,14 @@ This library has 3 modules:
 
 ## Setup
 
-Add this in your root `build.gradle` file:
-```gradle
-repositories {
-    // ...
-    maven { url "https://jitpack.io" }
-}
-```
+Add this in your `build.gradle.kts` file:
 
-Grab via Gradle (v4 or later):
-
-Gradle Groovy syntax
-```groovy
-// core library
-implementation 'com.github.omarmiatello.yeelight:core:1.0.3'
-
-// extensions example (my home)
-implementation 'com.github.omarmiatello.yeelight:home-ktx:1.0.3'
-```
-
-Gradle Kotlin syntax
 ```kotlin
 // core library
-implementation("com.github.omarmiatello.yeelight:core:1.0.3")
+implementation("com.github.omarmiatello.yeelight:core:1.0.4")
 
 // extensions example (my home)
-implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.3")
+implementation("com.github.omarmiatello.yeelight:home-ktx:1.0.4")
 ```
 
 ### Example

@@ -1,55 +1,51 @@
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
+// Project configuration
+
+val projectName = "yeelight"
+val projectVersion = "1.0.4"
+val projectGroup = "com.github.omarmiatello.yeelight"
+val projectRepoPath = "github.com/omarmiatello/yeelight"
+val sharedArtifacts = mapOf(
+    ":core" to "Control your Xiaomi Yeelight lamp using Kotlin",
+    ":home-ktx" to "[example] Control Xiaomi Yeelight for my home"
+)
+
+// Plugins configuration
+
 plugins {
     kotlin("jvm") version "1.4.31" apply false
     kotlin("plugin.serialization") version "1.4.30" apply false
-
-//    `java-library`
-//    `maven-publish`
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
-val p = loadProperties(file("local.properties").absolutePath)
-p.stringPropertyNames().forEach { key ->
-    val value = p.getProperty(key)
-    ext[key] = value
+
+// mavenCentral() configuration
+
+group = projectGroup
+version = projectVersion
+
+loadProperties(file("local.properties").absolutePath).also { p ->
+    p.stringPropertyNames().forEach { key ->
+        ext[key] = p.getProperty(key)
+    }
 }
-val ossrhUsername: String by ext
-val ossrhPassword: String by ext
-val signingKeyId: String by ext
-val signingPassword: String by ext
-val signingSecretKeyRingFile: String by ext
-
-ext["signing.keyId"] = signingKeyId
-ext["signing.password"] = signingPassword
-ext["signing.secretKeyRingFile"] = signingSecretKeyRingFile
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("mavenJava") {
-//            from(components["java"])
-//        }
-//    }
-//}
+val ossrhUsername: String? by ext
+val ossrhPassword: String? by ext
 
 nexusPublishing {
     repositories {
         create("myNexus") {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(ossrhUsername) // defaults to project.properties["myNexusUsername"]
-            password.set(ossrhPassword) // defaults to project.properties["myNexusPassword"]
+            username.set(ossrhUsername)
+            password.set(ossrhPassword)
         }
     }
 }
 
-group = "com.github.omarmiatello.yeelight"
-version = "1.0.3"
-
-configure(subprojects
-        - project(":app")) {
+configure(subprojects.filter { it.path in sharedArtifacts.keys }) {
     apply<JavaLibraryPlugin>()
-    apply<JacocoPlugin>()
     apply<SigningPlugin>()
     apply<MavenPublishPlugin>()
 
@@ -60,8 +56,6 @@ configure(subprojects
 
     configure<SigningExtension> {
         val publishing: PublishingExtension by project
-
-        //useInMemoryPgpKeys(signingKeyId, signingPassword)
         sign(publishing.publications)
     }
 
@@ -71,13 +65,16 @@ configure(subprojects
                 from(components["java"])
 
                 pom {
-                    name.set("yeelight :: ${project.name}")
-                    description.set("yeelight :: ${project.name} :: Control your Xiaomi Yeelight lamp using Kotlin")
-                    url.set("https://github.com/omarmiatello/yeelight")
+                    name.set("$projectName-${project.name}")
+                    description.set(sharedArtifacts.getValue(project.path))
+                    url.set("https://$projectRepoPath")
+                    group = projectGroup
+                    version = projectVersion
                     licenses {
                         license {
-                            name.set("MIT")
-                            url.set("https://opensource.org/licenses/MIT")
+                            name.set("MIT License")
+                            // https://opensource.org/licenses/MIT
+                            url.set("https://$projectRepoPath/blob/master/LICENSE")
                         }
                     }
                     developers {
@@ -88,9 +85,9 @@ configure(subprojects
                         }
                     }
                     scm {
-                        connection.set("scm:git:github.com/omarmiatello/yeelight.git")
-                        developerConnection.set("scm:git:ssh://github.com/omarmiatello/yeelight.git")
-                        url.set("https://github.com/omarmiatello/yeelight/tree/master")
+                        connection.set("scm:git:$projectRepoPath.git")
+                        developerConnection.set("scm:git:ssh://$projectRepoPath.git")
+                        url.set("https://$projectRepoPath/tree/master")
                     }
                 }
             }
