@@ -1,14 +1,16 @@
 package com.github.omarmiatello.yeelight
 
-import io.ktor.network.sockets.*
-import io.ktor.utils.io.*
+import io.ktor.network.sockets.SocketTimeoutException
+import io.ktor.network.sockets.aSocket
+import io.ktor.network.sockets.openReadChannel
+import io.ktor.network.sockets.openWriteChannel
+import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalTime::class)
 data class YeelightDevice(
     val id: String,
     val ip: String,
@@ -104,7 +106,6 @@ data class YeelightDevice(
     ) = send(YeelightApi.setColorRgb(color, effect, duration))
 }
 
-@OptIn(ExperimentalTime::class)
 fun String.toYeelightBulb(): YeelightDevice {
     val info = lines().map { it.split(":", limit = 2) }.filter { it.size == 2 }.associate { it[0] to it[1].trim() }
     val address = info.getValue("Location").split("//")[1].split(":")

@@ -1,4 +1,4 @@
-rootProject.name = "Yeelight"
+rootProject.name = "yeelight"
 
 include("core")
 include("home-ktx")

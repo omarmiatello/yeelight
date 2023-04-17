@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
 // Project configuration
@@ -14,9 +15,9 @@ val sharedArtifacts = mapOf(
 // Plugins configuration
 
 plugins {
-    kotlin("jvm") version "1.4.31" apply false
-    kotlin("plugin.serialization") version "1.4.30" apply false
-    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    kotlin("jvm") version "1.8.0" apply false
+    kotlin("plugin.serialization") version "1.8.20" apply false
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 
@@ -33,9 +34,10 @@ loadProperties(file("local.properties").absolutePath).also { p ->
 val ossrhUsername: String? by ext
 val ossrhPassword: String? by ext
 
+
 nexusPublishing {
     repositories {
-        create("myNexus") {
+        sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             username.set(ossrhUsername)
