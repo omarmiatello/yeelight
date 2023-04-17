@@ -8,7 +8,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
-import kotlin.time.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 private val json = Json {
     encodeDefaults = true
@@ -19,7 +22,6 @@ private val json = Json {
     }
 }
 
-@OptIn(ExperimentalTime::class)
 private fun colorFlowBuilder(
     flowTuples: List<FlowTuple>,
     repeat: Int = 1,
@@ -27,7 +29,6 @@ private fun colorFlowBuilder(
 ) = listOf(repeat * flowTuples.size, action.id, flowTuples.joinToString(","))
 
 // Docs: http://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf
-@OptIn(ExperimentalTime::class)
 object YeelightApi {
     fun getProperties(vararg propertiesNames: String) = YeelightCmd("get_prop", propertiesNames.toList())
 
@@ -37,7 +38,7 @@ object YeelightApi {
         isOn: Boolean = true,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = YeelightCmd("set_power", listOf(if (isOn) "on" else "off", effect.id, duration.toLongMilliseconds()))
+    ) = YeelightCmd("set_power", listOf(if (isOn) "on" else "off", effect.id, duration.inWholeMilliseconds))
 
     fun toggle() = YeelightCmd("toggle")
 
@@ -48,7 +49,7 @@ object YeelightApi {
         brightness: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = YeelightCmd("set_bright", listOf(brightness.coerceIn(1..100), effect.id, duration.toLongMilliseconds()))
+    ) = YeelightCmd("set_bright", listOf(brightness.coerceIn(1..100), effect.id, duration.inWholeMilliseconds))
 
     fun startColorFlowRaw(
         count: Int,
@@ -68,7 +69,7 @@ object YeelightApi {
 
     fun cronAdd(
         cron: YeelightCron
-    ) = YeelightCmd("cron_add", listOf(cron.type, cron.duration.coerceAtLeast(1.minutes).inMinutes.toInt()))
+    ) = YeelightCmd("cron_add", listOf(cron.type, cron.duration.coerceAtLeast(1.minutes).inWholeMinutes.toInt()))
 
     fun cronGet() = YeelightCmd("cron_get")
     fun cronDel() = YeelightCmd("cron_del")
@@ -82,7 +83,7 @@ object YeelightApi {
         duration: Duration = 500.milliseconds
     ) = YeelightCmd(
         "set_ct_abx",
-        listOf(whiteTemperature.coerceIn(1700..6500), effect.id, duration.toLongMilliseconds())
+        listOf(whiteTemperature.coerceIn(1700..6500), effect.id, duration.inWholeMilliseconds)
     )
 
     /**
@@ -92,7 +93,7 @@ object YeelightApi {
         color: Int,
         effect: SpeedEffect = SpeedEffect.smooth,
         duration: Duration = 500.milliseconds
-    ) = YeelightCmd("set_rgb", listOf(color.coerceIn(0..0xffffff), effect.id, duration.toLongMilliseconds()))
+    ) = YeelightCmd("set_rgb", listOf(color.coerceIn(0..0xffffff), effect.id, duration.inWholeMilliseconds))
 
     /**
      * hue: 0 - 359
@@ -105,7 +106,7 @@ object YeelightApi {
         duration: Duration = 500.milliseconds
     ) = YeelightCmd(
         "set_hsv",
-        listOf(hue.coerceIn(0..359), sat.coerceIn(0..100), effect.id, duration.toLongMilliseconds())
+        listOf(hue.coerceIn(0..359), sat.coerceIn(0..100), effect.id, duration.inWholeMilliseconds)
     )
 }
 
@@ -163,34 +164,29 @@ class SceneColorFlow(
     action: FlowEndAction = FlowEndAction.recover
 ) : YeelightScene("cf", colorFlowBuilder(flowTuples, repeat, action))
 
-@OptIn(ExperimentalTime::class)
 class SceneAutoDelayOff(
     brightness: Int = 100,
     duration: Duration = 1.minutes
-) : YeelightScene("auto_delay_off", listOf(brightness, duration.coerceAtLeast(1.minutes).inMinutes.toInt()))
+) : YeelightScene("auto_delay_off", listOf(brightness, duration.coerceAtLeast(1.minutes).inWholeMinutes.toInt()))
 
 // Cron
-@OptIn(ExperimentalTime::class)
 sealed class YeelightCron(val type: Int, val duration: Duration)
 
-@OptIn(ExperimentalTime::class)
 class CronPowerOff(
     duration: Duration
 ) : YeelightCron(0, duration)
 
 // Color Flow
 
-@OptIn(ExperimentalTime::class)
 sealed class FlowTuple(
     val duration: Duration,
     private val mode: FlowMode,
     val value: Int,
     val brightness: Int
 ) {
-    override fun toString() = "${duration.toLongMilliseconds()},${mode.id},$value,$brightness"
+    override fun toString() = "${duration.inWholeMilliseconds},${mode.id},$value,$brightness"
 }
 
-@OptIn(ExperimentalTime::class)
 class FlowColor(
     color: Int,
     brightness: Int = 100,
@@ -202,7 +198,6 @@ class FlowColor(
     brightness = brightness.coerceIn(-1..100)
 )
 
-@OptIn(ExperimentalTime::class)
 class FlowSleep(
     duration: Duration = 1.seconds
 ) : FlowTuple(
@@ -212,7 +207,6 @@ class FlowSleep(
     brightness = 0
 )
 
-@OptIn(ExperimentalTime::class)
 class FlowWhiteTemperature(
     whiteTemperature: Int,
     brightness: Int = 100,

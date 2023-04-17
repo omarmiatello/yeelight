@@ -2,9 +2,9 @@
 
 package com.github.omarmiatello.yeelight
 
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 
 fun flowGreen(speed: Double = 1.0) = listOf(
     FlowColor(0x00ff00, 100, 2.seconds * speed),

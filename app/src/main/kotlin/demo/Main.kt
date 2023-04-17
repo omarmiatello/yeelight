@@ -2,15 +2,22 @@
 
 package demo
 
-import com.github.omarmiatello.yeelight.*
+import com.github.omarmiatello.yeelight.CronPowerOff
+import com.github.omarmiatello.yeelight.FlowColor
+import com.github.omarmiatello.yeelight.FlowEndAction
+import com.github.omarmiatello.yeelight.FlowSleep
+import com.github.omarmiatello.yeelight.SceneAutoDelayOff
+import com.github.omarmiatello.yeelight.SpeedEffect
+import com.github.omarmiatello.yeelight.YeelightManager
+import com.github.omarmiatello.yeelight.flowPolice
 import com.github.omarmiatello.yeelight.home.cucina1
 import com.github.omarmiatello.yeelight.home.cucina2
 import com.github.omarmiatello.yeelight.home.roomCucina
 import kotlinx.coroutines.cancel
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.minutes
 
 suspend fun main() {
     val yeelight = YeelightManager()

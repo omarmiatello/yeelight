@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    implementation("io.ktor:ktor-network:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.5.0")
+    implementation("io.ktor:ktor-network:2.2.4")
 }
 
 tasks.test {
@@ -19,5 +19,5 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
